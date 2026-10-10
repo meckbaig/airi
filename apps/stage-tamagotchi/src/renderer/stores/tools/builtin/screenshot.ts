@@ -1,6 +1,7 @@
 import type { ScreenCaptureOptions } from '@proj-airi/stage-shared'
 import type { CommonContentPart, Tool } from '@xsai/shared-chat'
 
+import { buildReasoningOverrides } from '@proj-airi/stage-ui/libs/providers/reasoning'
 import { useLLM } from '@proj-airi/stage-ui/stores/llm'
 import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
 import { useLiveSessionStore } from '@proj-airi/stage-ui/stores/modules/live-session'
@@ -96,7 +97,7 @@ async function describeWithVisionModel(imageUrl: string, focus: string | undefin
         ],
       },
     ],
-    { vision: true },
+    { vision: true, requestOverrides: buildReasoningOverrides(visionStore.activeProvider, visionStore.reasoningMode) },
   )
   useLiveSessionStore().recordInferenceUsage(response.usage)
   return response.text?.trim() ?? ''
