@@ -8,6 +8,7 @@ import { streamText } from '@xsai/stream-text'
 import { defineStore } from 'pinia'
 import { toRaw } from 'vue'
 
+import { withToolResultImageSupport } from '../libs/providers/tool-result-images'
 import { sanitizeTools } from '../libs/providers/tool-schema'
 import { useAiriCardStore } from './modules/airi-card'
 import { useSettingsChat } from './settings/chat'
@@ -356,6 +357,7 @@ async function streamFrom(model: string, chatProvider: ChatProvider, messages: M
           includeUsage: true,
         },
         maxSteps: 10,
+        fetch: withToolResultImageSupport(chatConfig.fetch),
         messages: sanitized,
         headers: {
           ...(chatConfig.headers as Record<string, string> | undefined),
@@ -447,6 +449,7 @@ async function generateFrom(model: string, chatProvider: ChatProvider, messages:
     ...chatConfig,
     ...requestOverrides,
     maxSteps: 10,
+    fetch: withToolResultImageSupport(chatConfig.fetch),
     messages: sanitized,
     headers: {
       ...(chatConfig.headers as Record<string, string> | undefined),
