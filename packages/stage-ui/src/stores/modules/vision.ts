@@ -1,9 +1,9 @@
-import type { PrimaryDisplaySize } from '@proj-airi/stage-shared'
+import type { PrimaryDisplaySize, ScreenCaptureOptions, VisionWindowSource } from '@proj-airi/stage-shared'
 
 import type { ReasoningMode } from '../../libs/providers/reasoning'
 
 import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { isWithinSchedule, visionCaptureScreen, visionCheckPermission, visionGetPrimaryDisplaySize, visionRequestPermission } from '@proj-airi/stage-shared'
+import { isWithinSchedule, visionCaptureScreen, visionCheckPermission, visionGetPrimaryDisplaySize, visionListWindows, visionRequestPermission } from '@proj-airi/stage-shared'
 import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
@@ -54,6 +54,7 @@ export const useVisionStore = defineStore('vision', () => {
   const checkPermissionInvoke = useElectronEventaInvoke(visionCheckPermission)
   const requestPermissionInvoke = useElectronEventaInvoke(visionRequestPermission)
   const getPrimaryDisplaySizeInvoke = useElectronEventaInvoke(visionGetPrimaryDisplaySize)
+  const listWindowsInvoke = useElectronEventaInvoke(visionListWindows)
 
   // Cached primary display size so capture-resolution UI and the screen watcher
   // can reason about native resolution without an IPC round-trip per tick.
@@ -219,7 +220,7 @@ export const useVisionStore = defineStore('vision', () => {
    * When no dimensions are provided the capture defaults to the display's native
    * resolution (needed for accurate OCR).
    */
-  async function captureSnapshot(options?: { width?: number, height?: number, native?: boolean, downscalePercent?: number }) {
+  async function captureSnapshot(options?: ScreenCaptureOptions) {
     console.log('[Vision Store] captureSnapshot requested...')
 
     // 1. Permission Check (macOS only)
@@ -236,6 +237,9 @@ export const useVisionStore = defineStore('vision', () => {
         height: options?.height,
         native: options?.native,
         downscalePercent: options?.downscalePercent,
+        type: options?.type,
+        sourceId: options?.sourceId,
+        windowTitle: options?.windowTitle,
       })
 
       if (!result || !result.dataUrl) {
@@ -247,6 +251,16 @@ export const useVisionStore = defineStore('vision', () => {
     catch (err) {
       console.error('[Vision Store] captureSnapshot error:', err)
       return null
+    }
+  }
+
+  async function listWindows(): Promise<VisionWindowSource[]> {
+    try {
+      return await listWindowsInvoke() ?? []
+    }
+    catch (err) {
+      console.error('[Vision Store] listWindows error:', err)
+      return []
     }
   }
 
@@ -347,6 +361,7 @@ export const useVisionStore = defineStore('vision', () => {
     toggleWitness,
     heartbeat,
     captureSnapshot,
+    listWindows,
     checkPermissions,
     openPermissionSettings,
     getPrimaryDisplaySize,

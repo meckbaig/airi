@@ -279,6 +279,9 @@ export interface AiriExtension {
   dreamState?: DreamStateConfig
   shortTermMemory?: ShortTermMemoryConfig
   screenWatching?: ScreenWatchingConfig
+  agentScreenshot?: {
+    enabled?: boolean
+  }
   eventLedger?: EventLedgerConfig
   groundingEnabled?: boolean
   groundingMemoryEnabled?: boolean
