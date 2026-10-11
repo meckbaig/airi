@@ -1662,6 +1662,11 @@ chat:
       45s: 45 seconds
       60s: 60 seconds
       120s: 2 minutes
+  max-tool-calls:
+    title: Max tool calls per reply
+    description: How many tools (MCP, screenshots, memory, etc.) the character may call
+      while composing one reply. When the limit is reached, the character is
+      asked to answer with what it has.
 providers:
   speech:
     app_local_audio:

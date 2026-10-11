@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSettingsChat } from '@proj-airi/stage-ui/stores/settings'
-import { FieldSelect } from '@proj-airi/ui'
+import { FieldRange, FieldSelect } from '@proj-airi/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -44,6 +44,15 @@ const streamIdleTimeoutOptions = computed(() => [
       :label="t('settings.chat.stream-idle-timeout.title')"
       :description="t('settings.chat.stream-idle-timeout.description')"
       :options="streamIdleTimeoutOptions"
+    />
+
+    <FieldRange
+      v-model="settingsChat.maxToolCalls"
+      :min="1"
+      :max="50"
+      :step="1"
+      :label="t('settings.chat.max-tool-calls.title')"
+      :description="t('settings.chat.max-tool-calls.description')"
     />
   </div>
 </template>

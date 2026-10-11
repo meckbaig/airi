@@ -982,6 +982,7 @@ interface VoiceProfile {
 | `settings/chat/show-director-notes` | `boolean` | `true` | `stores/settings/chat.ts` |
 | `settings/chat/combine-system-messages` | `boolean` | `false` | `stores/settings/chat.ts` |
 | `settings/chat/suggest-mode` | `string` | — | `stores/settings/chat.ts` |
+| `settings/chat/max-tool-calls` | `number` | `10` | `stores/settings/chat.ts` |
 | `chat/messages/v2` | (chat history) | — | `stores/chat/constants.ts` |
 | `chat/active-session` | `string` | — | `stores/chat/constants.ts` |
 | `airi:chat:grounding-preview-expanded` | `boolean` | — | `apps/stage-tamagotchi/.../InteractiveArea.vue` |

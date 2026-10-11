@@ -10,6 +10,7 @@ export const useSettingsChat = defineStore('settings-chat', () => {
   const streamIdleTimeoutMs = useLocalStorageManualReset<number>('settings/chat/stream-idle-timeout-ms', 600000)
   const showDirectorNotes = useLocalStorageManualReset<boolean>('settings/chat/show-director-notes', true)
   const combineSystemMessages = useLocalStorageManualReset<boolean>('settings/chat/combine-system-messages', false)
+  const maxToolCalls = useLocalStorageManualReset<number>('settings/chat/max-tool-calls', 10)
 
   // Migration: force-update existing users from 30s to 10min
   if (streamIdleTimeoutMs.value === 30000) {
@@ -22,6 +23,7 @@ export const useSettingsChat = defineStore('settings-chat', () => {
     streamIdleTimeoutMs.reset()
     showDirectorNotes.reset()
     combineSystemMessages.reset()
+    maxToolCalls.reset()
   }
 
   return {
@@ -30,6 +32,7 @@ export const useSettingsChat = defineStore('settings-chat', () => {
     streamIdleTimeoutMs,
     showDirectorNotes,
     combineSystemMessages,
+    maxToolCalls,
     resetState,
   }
 })

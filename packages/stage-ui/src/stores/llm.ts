@@ -8,6 +8,7 @@ import { streamText } from '@xsai/stream-text'
 import { defineStore } from 'pinia'
 import { toRaw } from 'vue'
 
+import { withToolCallBudget } from '../libs/providers/tool-call-budget'
 import { withToolResultImageSupport } from '../libs/providers/tool-result-images'
 import { sanitizeTools } from '../libs/providers/tool-schema'
 import { useAiriCardStore } from './modules/airi-card'
@@ -304,7 +305,7 @@ async function streamFrom(model: string, chatProvider: ChatProvider, messages: M
   if (sanitizedTools && sanitizedTools.length > 0) {
     debug('[llmStore] Resolved system tools before filtering:', sanitizedTools.map((t: any) => t.function?.name || t.name))
   }
-  const tools = filterToolsByAllowedTools(sanitizedTools)
+  const { tools, maxSteps } = withToolCallBudget(filterToolsByAllowedTools(sanitizedTools), settingsChat.maxToolCalls)
 
   if (tools && tools.length > 0) {
     debug('Calling LLM with tools', tools.map((t: any) => t.function?.name || t.name))
@@ -356,7 +357,7 @@ async function streamFrom(model: string, chatProvider: ChatProvider, messages: M
         streamOptions: {
           includeUsage: true,
         },
-        maxSteps: 10,
+        maxSteps,
         fetch: withToolResultImageSupport(chatConfig.fetch),
         messages: sanitized,
         headers: {
@@ -394,6 +395,9 @@ async function streamFrom(model: string, chatProvider: ChatProvider, messages: M
       // Derive usage from per-step final usage objects (see aggregateStepUsage) to
       // avoid the per-chunk cumulative-usage inflation in @xsai/stream-text.
       void result.steps.then(async (steps) => {
+        if (steps.length >= maxSteps && steps.at(-1)?.toolCalls?.length)
+          console.warn(`[LLM:Stream] Tool loop stopped after ${maxSteps} rounds before the model replied.`)
+
         let usage = aggregateStepUsage(steps)
         if (!usage) {
           const rawUsage = await result.usage.catch(() => undefined)
@@ -436,7 +440,7 @@ async function generateFrom(model: string, chatProvider: ChatProvider, messages:
   if (sanitizedTools && sanitizedTools.length > 0) {
     debug('[llmStore] Resolved system tools before filtering:', sanitizedTools.map((t: any) => t.function?.name || t.name))
   }
-  const tools = filterToolsByAllowedTools(sanitizedTools)
+  const { tools, maxSteps } = withToolCallBudget(filterToolsByAllowedTools(sanitizedTools), settingsChat.maxToolCalls)
 
   if (tools && tools.length > 0) {
     debug('Calling LLM with tools', tools.map((t: any) => t.function?.name || t.name))
@@ -448,7 +452,7 @@ async function generateFrom(model: string, chatProvider: ChatProvider, messages:
   return await generateText({
     ...chatConfig,
     ...requestOverrides,
-    maxSteps: 10,
+    maxSteps,
     fetch: withToolResultImageSupport(chatConfig.fetch),
     messages: sanitized,
     headers: {
