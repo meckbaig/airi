@@ -83,9 +83,6 @@ export {
   downloadLayaModel,
   ensureOrtConfigured,
   isLayaDownloaded,
-  LAYA_FP16_MODEL_FILE,
-  LAYA_HF_REPO,
-  LAYA_INT8_MODEL_FILE,
   loadLayaSession,
   loadLayaTokenizer,
   resetLayaSession,
@@ -93,6 +90,8 @@ export {
   terminateLayaWorker,
 } from './laya-engine'
 export type { LayaDownloadProgress, LayaSessionOptions } from './laya-engine'
+export { LAYA_MODEL_SPECS } from './laya-models'
+export type { LayaModelSpec } from './laya-models'
 export {
   classifyError,
   createRequestId,
